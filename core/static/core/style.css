@@ -1,0 +1,30 @@
+/* Custom styles (if needed) */
+
+/* Custom font */
+body {
+    font-family: 'Arial', sans-serif;
+}
+
+/* Custom hover effects */
+button:hover {
+    background-color: #4C6B8D; /* A darker blue on hover */
+    transform: scale(1.05);
+    transition: transform 0.3s ease, background-color 0.3s ease;
+}
+
+/* Custom Loader Style */
+.ep__loader {
+    border-top-color: #4A90E2; /* Blue color for the loader */
+    border-width: 4px;
+}
+
+/* Media Queries for Mobile */
+@media (max-width: 768px) {
+    .modes_div {
+        font-size: 14px;
+    }
+
+    .tool__input textarea {
+        font-size: 16px;
+    }
+}

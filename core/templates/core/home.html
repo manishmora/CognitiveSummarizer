@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cognitive Summarizer</title>
+  <style>
+    :root {
+      --primary: #4f46e5;
+      --bg-light: #f9fafb;
+      --bg-dark: #1f2937;
+      --text-dark: #111827;
+      --text-light: #f3f4f6;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: var(--bg-light);
+      color: var(--text-dark);
+      line-height: 1.6;
+    }
+
+    .container {
+      max-width: 960px;
+      margin: 2rem auto;
+      padding: 1rem;
+    }
+
+    h1 {
+      text-align: center;
+      color: var(--primary);
+      margin-bottom: 1rem;
+    }
+
+    textarea {
+      width: 100%;
+      height: 150px;
+      padding: 1rem;
+      font-size: 1rem;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      resize: vertical;
+    }
+
+    .upload-section {
+      margin-top: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 1rem;
+      margin: 1.5rem 0;
+    }
+
+    .btn {
+      background-color: var(--primary);
+      color: white;
+      padding: 0.75rem 1.5rem;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: background-color 0.3s ease;
+    }
+
+    .btn:hover {
+      background-color: #3730a3;
+    }
+
+    select {
+      padding: 0.6rem 1rem;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-size: 1rem;
+    }
+
+    /* Centering the Summary section and expanding it */
+    .summary-section {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 2rem;
+    }
+
+    .summary-box {
+      width: 100%;
+      max-width: 100%;
+      background-color: white;
+      padding: 2rem;
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    }
+
+    .results {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1rem;
+      margin-top: 2rem;
+    }
+
+    .card {
+      background-color: white;
+      padding: 1rem;
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+      transition: transform 0.3s ease;
+    }
+
+    .card:hover {
+      transform: translateY(-5px);
+    }
+
+    .card h3 {
+      margin-bottom: 0.5rem;
+      color: var(--primary);
+    }
+    .card h2 {
+      margin-bottom: 0.5rem;
+      color: var(--primary);
+    }
+
+    footer {
+      text-align: center;
+      margin: 2rem 0 1rem;
+      font-size: 0.875rem;
+      color: #6b7280;
+    }
+
+    @media (max-width: 600px) {
+      .btn {
+        width: 100%;
+      }
+
+      select {
+        width: 100%;
+      }
+    }
+  </style>
+  <!-- Add Plotly.js -->
+  <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+</head>
+<body>
+  <div class="container">
+    <h1>Cognitive Summarizer</h1>
+
+    <form method="POST" enctype="multipart/form-data" action="{% url 'home' %}">
+      {% csrf_token %}
+      <!-- Textarea for input -->
+      <textarea name="text_input" placeholder="Enter or paste your text here..." >{{ text_input }}</textarea>
+
+      <!-- Upload section -->
+      <div class="upload-section">
+        <input type="file" name="doc_file" accept=".txt,.doc,.docx,.pdf" />
+        <span>(File upload is optional)</span>
+      </div>
+
+      <!-- Role selection -->
+      <div class="actions">
+        <select name="user_role" required>
+          <option value="">Select Role</option>
+          <option value="engineer" {% if role == 'engineer' %}selected{% endif %}>Engineer</option>
+          <option value="manager" {% if role == 'manager' %}selected{% endif %}>Manager</option>
+          <option value="client" {% if role == 'client' %}selected{% endif %}>Client</option>
+          <option value="researcher" {% if role == 'researcher' %}selected{% endif %}>Researcher</option>
+        </select>
+      </div>
+
+      <!-- Action buttons -->
+      <div class="actions">
+        <button type="submit" name="action" value="personalized" class="btn">🔍 Personalized Summary</button>
+      </div>
+    </form>
+
+    <!-- Summary Section -->
+    <div class="summary-section">
+      <div class="summary-box">
+        <h3>Summary</h3>
+        <p>{{ summary|default:"Your summary will appear here." }}</p>
+      </div>
+    </div>
+
+    <!-- Result cards for Word and Sentence Count -->
+     <div class="card">
+    <div class="results">
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
+
+        <!-- Summary Metrics -->
+        <div class="bg-white rounded-2xl shadow p-6 space-y-4">
+          <h3 class="text-xl font-semibold text-gray-800">Summary Metrics</h3>
+          <div class="text-sm text-gray-700">
+            <p><strong>Summary Length Ratio:</strong> {{ summary_ratio|default:"N/A" }}</p>
+            <p><strong>Original Word Count:</strong> {{ text_input|wordcount }}</p>
+            <p><strong>Summarized Word Count:</strong> {{ word_count }}</p>
+            <p><strong>Sentence Count:</strong> {{ sentence_count }}</p>
+          </div>
+        </div>
+      
+        <!-- ROUGE Scores -->
+        {% if rouge_scores %}
+        <div class="bg-white rounded-2xl shadow p-6 space-y-4">
+          <h3 class="text-xl font-semibold text-gray-800">ROUGE Scores</h3>
+          <div class="text-sm text-gray-700">
+            <p><strong>ROUGE-1:</strong> {{ rouge_scores.rouge1.fmeasure|floatformat:2 }}</p>
+            <p><strong>ROUGE-2:</strong> {{ rouge_scores.rouge2.fmeasure|floatformat:2 }}</p>
+            <p><strong>ROUGE-L:</strong> {{ rouge_scores.rougeL.fmeasure|floatformat:2 }}</p>
+          </div>
+        </div>
+        {% endif %}
+      
+        <!-- Original Text
+        <div class="bg-white rounded-2xl shadow p-6 col-span-1 lg:col-span-2">
+          <h3 class="text-xl font-semibold text-gray-800 mb-2">Original Text</h3>
+          <div class="p-4 bg-gray-50 rounded text-sm text-gray-800 whitespace-pre-wrap">{{ text_input }}</div>
+        </div> -->
+      
+        <!-- Summarized Text
+        {% if summary %}
+        <div class="bg-white rounded-2xl shadow p-6 col-span-1 lg:col-span-2">
+          <h3 class="text-xl font-semibold text-gray-800 mb-2">Summarized Text</h3>
+          <div class="p-4 bg-gray-50 rounded text-sm text-gray-800 whitespace-pre-wrap">{{ summary|linebreaksbr }}</div>
+        </div>
+        {% endif %}
+      </div> -->
+    </div>
+      
+      <!-- <div class="card">
+        <div class="card">
+          <h3>Summary Length Ratio</h3>
+          <p>{{ summary_ratio|default:"N/A" }}</p>
+        </div>
+        
+        {% if rouge_scores %}
+        <div class="card">
+          <h3>ROUGE Scores</h3>
+          <ul>
+            <li><strong>ROUGE-1:</strong> {{ rouge_scores.rouge1.fmeasure|floatformat:2 }}</li>
+            <li><strong>ROUGE-2:</strong> {{ rouge_scores.rouge2.fmeasure|floatformat:2 }}</li>
+            <li><strong>ROUGE-L:</strong> {{ rouge_scores.rougeL.fmeasure|floatformat:2 }}</li>
+          </ul>
+        </div>
+        {% endif %}
+        
+        <h3>Word Count</h3>
+        <p>{{ word_count|default:"0" }} Words</p>
+      </div>
+      <div class="card">
+        <h3>Sentence Count</h3>
+        <p>{{ sentence_count|default:"0" }} Sentences</p> -->
+          <!-- Length Comparison
+<div class="card">
+  <h2 class=""> <bold>Text Length Comparison:</bold></h2>
+    <p><strong><h3>Original Text Length:</h3></strong> {{ text_input|length }} characters</p>
+    <p><strong><h3>Summarized Text Length:</h3></strong> {{ summary|length }} characters</p>
+</div> -->
+
+      </div>
+    </div>
+
+
+
+   <!-- ROUGE and Ratio Metrics
+<div class="results">
+  <div class="card">
+    <h3>Summary Length Ratio</h3>
+    <p>{{ summary_ratio }}</p>
+  </div>
+  <div class="card">
+    <h3>ROUGE Scores</h3>
+    <p>ROUGE-1: {{ rouge_scores.rouge1.fmeasure|floatformat:2 }}</p>
+    <p>ROUGE-2: {{ rouge_scores.rouge2.fmeasure|floatformat:2 }}</p>
+    <p>ROUGE-L: {{ rouge_scores.rougeL.fmeasure|floatformat:2 }}</p>
+  </div>
+  <div class="card">
+    <h3>Text Lengths</h3>
+    <p>Original: {{ original_length }} chars</p>
+    <p>Summary: {{ summary_length }} chars</p>
+  </div>
+</div>  -->
+
+<!-- Full Texts
+<div class="summary-section">
+  <div class="summary-box">
+    <h3>Original Text</h3>
+    <p>{{ original_text|linebreaksbr }}</p>
+  </div>
+</div>
+
+<div class="summary-section">
+  <div class="summary-box">
+    <h3>Summarized Text</h3>
+    <p>{{ summary|linebreaksbr }}</p>
+  </div>
+</div> -->
+        <div class="Length Comparison"></div>
+          <div class="card">
+            <h2 class=""> <bold>Text Length Comparison:</bold></h2>
+              <p><strong><h3>Original Text Length:</h3></strong> {{ original_text|length }} characters</p>
+              <p><strong><h3>Summarized Text Length:</h3></strong> {{ summary|length }} characters</p>
+          </div>
+        </div>
+          
+
+
+    <!-- Plotly Visualizations Section (Centered, Not Full Width) -->
+<div class="flex justify-center mt-6">
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-4xl">
+    
+    {% if word_freq_plot %}
+      <div class="bg-white shadow-md rounded-2xl p-6 border flex flex-col items-center">
+        <h3 class="text-lg font-semibold text-center mb-4">Word Frequency Distribution</h3>
+        <div class="w-full">{{ word_freq_plot|safe }}</div>
+      </div>
+    {% endif %}
+
+    {% if sentence_length_plot %}
+      <div class="bg-white shadow-md rounded-2xl p-6 border flex flex-col items-center">
+        <h3 class="text-lg font-semibold text-center mb-4">Sentence Length Distribution</h3>
+        <div class="w-full">{{ sentence_length_plot|safe }}</div>
+      </div>
+    {% endif %}
+
+  </div>
+</div>
+
+
+
+
+
+  <footer>&copy; 2025 Cognitive Summarizer. All rights reserved.</footer>
+</body>
+</html>
