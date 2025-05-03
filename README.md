@@ -2,7 +2,7 @@
 
 ## Project Overview
 
-**Cognitive Summarizer** is a Django-based web application designed to automatically summarize technical reports and long documents. Leveraging powerful AI models, including **BART** and **Gemini**, the application condenses documents into concise summaries while retaining the most important details. It also provides detailed performance metrics and visualizations to evaluate the summarization process, making it an ideal tool for anyone working with large technical documents.
+**Cognitive Summarizer** is a Django-based web application designed to automatically summarize technical reports and long documents. Leveraging powerful AI models, including **BART**, the application condenses documents into concise summaries while retaining the most important details. It also provides detailed performance metrics and visualizations to evaluate the summarization process, making it an ideal tool for anyone working with large technical documents.
 
 ### Key Features:
 
