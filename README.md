@@ -1,115 +1,32 @@
 # Cognitive Summarizer
-Project Overview
-Cognitive Summarizer is a Django-based web application designed to automatically summarize technical reports and long documents. Leveraging powerful AI models, including BART and Gemini, the application condenses documents into concise summaries while retaining the most important details. It also provides detailed performance metrics and visualizations to evaluate the summarization process, making it an ideal tool for anyone working with large technical documents.
 
-Key Features:
-AI-Powered Summarization: Uses machine learning models to summarize long texts, focusing on retaining essential content.
+## Project Overview
 
-Evaluation Metrics: Provides performance metrics, such as ROUGE scores, and compares the lengths of the original and summarized text.
+**Cognitive Summarizer** is a Django-based web application designed to automatically summarize technical reports and long documents. Leveraging powerful AI models, including **BART** and **Gemini**, the application condenses documents into concise summaries while retaining the most important details. It also provides detailed performance metrics and visualizations to evaluate the summarization process, making it an ideal tool for anyone working with large technical documents.
 
-Interactive UI: A clean and responsive interface designed with Tailwind CSS to provide an optimal user experience.
+### Key Features:
 
-Document Viewer: Displays the original document and the generated summary side by side.
+- **AI-Powered Summarization**: Uses machine learning models to summarize long texts, focusing on retaining essential content.
+- **Evaluation Metrics**: Provides performance metrics, such as ROUGE scores, and compares the lengths of the original and summarized text.
+- **Interactive UI**: A clean and responsive interface designed with **Tailwind CSS** to provide an optimal user experience.
+- **Document Viewer**: Displays the original document and the generated summary side by side.
+- **Download and Copy**: Users can download the summarized text or copy it directly to their clipboard.
+- **Error Handling**: Handles issues like empty document uploads gracefully, providing feedback to users.
 
-Download and Copy: Users can download the summarized text or copy it directly to their clipboard.
+---
 
-Error Handling: Handles issues like empty document uploads gracefully, providing feedback to users.
+## Installation Guide
 
-Installation Guide
-To set up the Cognitive Summarizer locally, follow these steps:
+To set up the **Cognitive Summarizer** locally, follow these steps:
 
-Prerequisites:
-Python 3.x (Recommended: Python 3.8 or higher)
+### Prerequisites:
 
-pip (Python package manager)
+- **Python 3.x** (Recommended: Python 3.8 or higher)
+- **pip** (Python package manager)
+- **Django 5.x**
+- **Git** (for version control)
+- **A text editor** (e.g., Visual Studio Code, PyCharm)
 
-Django 5.x
-
-Git (for version control)
-
-A text editor (e.g., Visual Studio Code, PyCharm)
-
-Step-by-Step Setup:
-Clone the Repository
-
-First, clone the repository to your local machine:
-
-bash
-Copy
-Edit
-git clone https://github.com/manishmora/CognitiveSummarizer.git
-Navigate to the Project Directory
-
-Change into the project directory:
-
-bash
-Copy
-Edit
-cd CognitiveSummarizer
-Create and Activate a Virtual Environment (optional but recommended)
-
-Create a virtual environment to isolate your dependencies:
-
-bash
-Copy
-Edit
-python -m venv venv
-Then activate it:
-
-Windows:
-
-bash
-Copy
-Edit
-.\venv\Scripts\activate
-Mac/Linux:
-
-bash
-Copy
-Edit
-source venv/bin/activate
-Install Dependencies
-
-Install the required Python libraries using pip:
-
-bash
-Copy
-Edit
-pip install -r requirements.txt
-Set Up Environment Variables
-
-Create a .env file in the root directory and add the necessary environment variables:
-
-ini
-Copy
-Edit
-SECRET_KEY=your-django-secret-key
-DEBUG=True
-ALLOWED_HOSTS=localhost,127.0.0.1
-OPENAI_API_KEY=your-openai-api-key (if applicable)
-SECRET_KEY: A secret key for your Django project (generated using Django's django.core.management.utils.get_random_secret_key()).
-
-OPENAI_API_KEY: If you are using OpenAI's API for text summarization, you can add the key here.
-
-Migrate the Database
-
-Apply the database migrations:
-
-bash
-Copy
-Edit
-python manage.py migrate
-Start the Development Server
-
-Run the development server:
-
-bash
-Copy
-Edit
-python manage.py runserver
-Access the Application
-
-Open your browser and go to http://127.0.0.1:8000/ to view the application in action.
 
 Features and Functionality
 1. Document Summarization
@@ -163,9 +80,6 @@ Follow the PEP 8 style guide for Python code.
 Write meaningful commit messages.
 
 Ensure that your code is tested and does not break any existing functionality.
-
-License
-This project is licensed under the MIT License. See the LICENSE file for more information.
 
 Acknowledgments
 Django for building the web application framework.
